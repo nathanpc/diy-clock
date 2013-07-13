@@ -12,6 +12,7 @@
 #include "boolean.h"
 #include "delay.h"
 #include "bitio.h"
+#include "fonts.h"
 
 // Pins.
 #define SCLK BIT0
