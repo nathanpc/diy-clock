@@ -1,6 +1,6 @@
 /**
- *  test.c
- *  Test drive.
+ *  main.c
+ *  Bed-side clock firmware.
  *
  *  @author Nathan Campos <nathanpc@dreamintech.net>
  */
@@ -12,6 +12,20 @@
 #include "boolean.h"
 #include "delay.h"
 
+void print_digit(unsigned int digit);
+
+// TODO: Move this crazyness to it's own header file.
+char big_font[][3][18] = {
+	{  // 0
+		{ 0b00000000, 0b00000000, 0b11111100, 0b11111100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b11111100, 0b11111100, 0b00000000, 0b00000000 },
+		{ 0b00000000, 0b00000000, 0b11111100, 0b11111100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b11111100, 0b11111100, 0b00000000, 0b00000000 },
+		{ 0b00000000, 0b00000000, 0b11111100, 0b11111100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b00001100, 0b11111100, 0b11111100, 0b00000000, 0b00000000 }
+	}
+};
+
+/**
+ *  The mains.
+ */
 void main() {
 	WDTCTL = WDTPW + WDTHOLD;  // Disable WDT.
 	BCSCTL1 = CALBC1_1MHZ;     // 1MHz clock.
@@ -24,29 +38,23 @@ void main() {
 	lcd_init();
 	lcd_clear();
 
-	// A simple string print.
-	lcd_print("Hello, world!");
-
-	// Another example string.
-	lcd_set_pos(0, 1);  // Going to the second row.
-	lcd_print("Nathan Campos");
-
-	// A simple bar.
-	lcd_set_pos(0, 1);
-	for (unsigned int i = 0; i < 84; i++) {
-		lcd_command(0, 0b11111111);
-		delay_ms(10);
-	}
-
-	// Clear just that row and write some text.
-	lcd_clear_row(1);
-	lcd_putc('@');  // If all you want is a single character.
-	lcd_print("nathanpc");
-
-	// And more text!
-	lcd_set_pos(0, 3);
-	lcd_print("http://about.me/nathanpc");
+	print_digit(0);
 
 	while (TRUE) {
+	}
+}
+
+/**
+ *  Prints a big 18x24 digit in the screen.
+ *
+ *  @param digit A number from 0 to 9.
+ */
+void print_digit(unsigned int digit) {
+	for (unsigned int row = 0; row < 3; row++) {
+		lcd_set_pos(0, row + 2);
+
+		for (unsigned int col = 0; col < 18; col++) {
+			lcd_command(0, big_font[digit][row][col]);
+		}
 	}
 }
