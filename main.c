@@ -16,6 +16,10 @@
 #include "delay.h"
 #include "fonts.h"
 
+void print_date(unsigned int day, unsigned int month);
+void print_temp(unsigned int temp);
+void print_time(unsigned int hour, unsigned int minutes, bool pm);
+
 void print_digit(unsigned int pos, unsigned int digit);
 void print_symbol(unsigned int pos, unsigned int symbol);
 
@@ -35,27 +39,65 @@ void main() {
 	lcd_clear();
 
 	// Date.
-	//lcd_set_pos(0, 0);
-	lcd_print("13 Jul");
+	print(13, 7);
 
 	// Temp.
+	print_temp(888);
+
+	// Digits.
+	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
+	print_time(88, 88, FALSE);
+
+	while (TRUE) {
+	}
+}
+
+/**
+ *  Prints a date on the screen.
+ *
+ *  @param day A day.
+ *  @param month A month.
+ */
+void print_date(unsigned int day, unsigned int month) {
+	// TODO: Use sprintf to generate a string.
+	lcd_set_pos(0, 0);
+	lcd_print("13 Jul");
+}
+
+/**
+ *  Prints the temperature on the screen.
+ *
+ *  @param temp The integer temperature that will be converted to float.
+ */
+void print_temp(unsigned int temp) {
+	// TODO: Convert to float.
+	// TODO: Use ftoa.
 	lcd_set_pos(49, 0);
 	lcd_print("88.8");
 	lcd_putc(0x7F);
 	lcd_putc('C');
+}
 
-	// Digits.
+/**
+ *  Prints the time on the screen.
+ *
+ *  @param hour The hour.
+ *  @param minutes The minutes.
+ *  @param pm Is is afternoon already?
+ */
+void print_time(unsigned int hour, unsigned int minutes, bool pm) {
+	// TODO: Separate each part into digits.
 	print_digit(0, 8);
 	print_digit(1, 8);
 	print_digit(2, 8);
 	print_digit(3, 8);
-	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
 
 	// AM/PM
 	lcd_set_pos(71, 5);
-	lcd_print("AM");
-
-	while (TRUE) {
+	if (pm) {
+		lcd_print("PM");
+	} else {
+		lcd_print("AM");
 	}
 }
 
