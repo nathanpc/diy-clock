@@ -34,11 +34,26 @@ void main() {
 	lcd_init();
 	lcd_clear();
 
+	// Date.
+	//lcd_set_pos(0, 0);
+	lcd_print("13 Jul");
+
+	// Temp.
+	lcd_set_pos(49, 0);
+	lcd_print("88.8");
+	lcd_putc(0x7F);
+	lcd_putc('C');
+
+	// Digits.
 	print_digit(0, 8);
 	print_digit(1, 8);
 	print_digit(2, 8);
 	print_digit(3, 8);
 	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
+
+	// AM/PM
+	lcd_set_pos(71, 5);
+	lcd_print("AM");
 
 	while (TRUE) {
 	}
