@@ -10,6 +10,7 @@
 
 // Devices.
 #include "PCD8544.h"
+#include "temp.h"
 
 // Helpers.
 #include "boolean.h"
