@@ -39,7 +39,7 @@ void main() {
 	lcd_clear();
 
 	// Date.
-	print(13, 7);
+	print_date(13, 7);
 
 	// Temp.
 	print_temp(888);
