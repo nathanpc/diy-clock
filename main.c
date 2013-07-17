@@ -10,12 +10,15 @@
 
 // Devices.
 #include "PCD8544.h"
-#include "temp.h"
+#include "adc.h"
 
 // Helpers.
 #include "boolean.h"
 #include "delay.h"
 #include "fonts.h"
+
+// Properties.
+#define APROX_VIN 3
 
 void print_date(unsigned int day, unsigned int month);
 void print_temp(unsigned int temp);
@@ -33,12 +36,16 @@ void main() {
 	DCOCTL = CALDCO_1MHZ;
 	BCSCTL2 &= ~(DIVS_3);      // SMCLK = DCO = 1MHz.
 
+	// Setup ADC.
+	adc_setup();
+	__enable_interrupt();
+
 	// Setup the LCD stuff.
 	lcd_setup();
 	delay_ms(1);  // Just to make sure the LCD is ready
 	lcd_init();
 	lcd_clear();
-
+/*
 	// Date.
 	print_date(13, 7);
 
@@ -48,8 +55,18 @@ void main() {
 	// Digits.
 	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
 	print_time(88, 88, FALSE);
-
+*/
 	while (TRUE) {
+		delay_ms(500);
+		char str[12];
+		fetch_adc_readings();
+		snprintf(str, sizeof(str), "%d", (get_adc_sample(0) * APROX_VIN));
+		lcd_set_pos(0,0);
+		lcd_print(str);
+		snprintf(str, sizeof(str), "%d", get_adc_sample(1));
+		lcd_set_pos(0,1);
+		lcd_print(str);
+		//get_adc_sample(1);
 	}
 }
 

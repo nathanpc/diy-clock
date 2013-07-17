@@ -3,7 +3,7 @@ DEVICE= msp430g2553
 PROJECT = $(NAME)-$(DEVICE)
 CC = msp430-gcc -std=c99 -Os -mmcu=$(DEVICE)
 MSPDEBUG = sudo mspdebug rf2500
-SRC = main.c PCD8544.c temp.c delay.c bitio.c
+SRC = main.c PCD8544.c adc.c delay.c bitio.c
 
 all: $(PROJECT).elf
 
