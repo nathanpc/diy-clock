@@ -16,16 +16,20 @@
 #include "boolean.h"
 #include "delay.h"
 #include "fonts.h"
+#include "ftoa.h"
 
 // Properties.
-#define APROX_VIN 3
+#define APROX_VIN 3.6
+#define AVG_READS 20
+
+float get_temperature();
 
 void print_date(unsigned int day, unsigned int month);
-void print_temp(unsigned int temp);
+void print_temp(float temp);
 void print_time(unsigned int hour, unsigned int minutes, bool pm);
-
 void print_digit(unsigned int pos, unsigned int digit);
 void print_symbol(unsigned int pos, unsigned int symbol);
+
 
 /**
  *  The mains.
@@ -58,16 +62,37 @@ void main() {
 */
 	while (TRUE) {
 		delay_ms(500);
+
+		print_temp(get_temperature());
+
+		/*
 		char str[12];
 		fetch_adc_readings();
-		snprintf(str, sizeof(str), "%d", (get_adc_sample(0) * APROX_VIN));
-		lcd_set_pos(0,0);
-		lcd_print(str);
-		snprintf(str, sizeof(str), "%d", get_adc_sample(1));
+		snprintf(str, sizeof(str), "%d", get_adc_sample(0));
 		lcd_set_pos(0,1);
 		lcd_print(str);
-		//get_adc_sample(1);
+		lcd_putc(' ');
+		*/
 	}
+}
+
+float get_temperature() {
+	float readings[AVG_READS];
+	float avg_read = 0.0;
+
+	// Get the values.
+	for (unsigned int i = 0; i < AVG_READS; i++) {
+		fetch_adc_readings();
+		readings[i] = ((get_adc_sample(1) * APROX_VIN) / 1024) * 100;
+	}
+
+	// Sum everything.
+	for (unsigned int read = 0; read < AVG_READS; read++) {
+		avg_read += readings[read];
+	}
+
+	// Average the readings.
+	return avg_read / AVG_READS;
 }
 
 /**
@@ -87,11 +112,14 @@ void print_date(unsigned int day, unsigned int month) {
  *
  *  @param temp The integer temperature that will be converted to float.
  */
-void print_temp(unsigned int temp) {
-	// TODO: Convert to float.
-	// TODO: Use ftoa.
-	lcd_set_pos(49, 0);
-	lcd_print("88.8");
+void print_temp(float temp) {
+	// Convert float to string.
+	char str[6];
+	ftoa(str, temp, 2);
+
+	// Posiiton and print.
+	lcd_set_pos(43, 0);
+	lcd_print(str);
 	lcd_putc(0x7F);
 	lcd_putc('C');
 }
