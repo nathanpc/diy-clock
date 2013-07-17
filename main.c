@@ -76,6 +76,11 @@ void main() {
 	}
 }
 
+/**
+ *  Gets a average temperature.
+ *
+ *  @return A temperature.
+ */
 float get_temperature() {
 	float readings[AVG_READS];
 	float avg_read = 0.0;
@@ -122,6 +127,7 @@ void print_temp(float temp) {
 	lcd_print(str);
 	lcd_putc(0x7F);
 	lcd_putc('C');
+	lcd_putc(' ');  // Just to make sure.
 }
 
 /**
