@@ -18,6 +18,10 @@
 #include "fonts.h"
 #include "ftoa.h"
 
+// Pins.
+#define LOWBATT BIT5
+#define MOTION  BIT4
+
 // Properties.
 #define APROX_VIN 3.6
 #define AVG_READS 20
@@ -29,6 +33,7 @@ void print_temp(float temp);
 void print_time(unsigned int hour, unsigned int minutes, bool pm);
 void print_digit(unsigned int pos, unsigned int digit);
 void print_symbol(unsigned int pos, unsigned int symbol);
+void print_batt_symbol(unsigned int symbol);
 
 
 /**
@@ -40,6 +45,10 @@ void main() {
 	DCOCTL = CALDCO_1MHZ;
 	BCSCTL2 &= ~(DIVS_3);      // SMCLK = DCO = 1MHz.
 
+	// Setup the low battery stuff.
+	P1DIR &= ~(LOWBATT + MOTION);
+	// TODO: Setup a interrupt.
+
 	// Setup ADC.
 	adc_setup();
 	__enable_interrupt();
@@ -49,21 +58,35 @@ void main() {
 	delay_ms(1);  // Just to make sure the LCD is ready
 	lcd_init();
 	lcd_clear();
-/*
+
+	/*
 	// Date.
 	print_date(13, 7);
 
 	// Temp.
-	print_temp(888);
+	//print_temp(888);
 
 	// Digits.
 	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
 	print_time(88, 88, FALSE);
-*/
-	while (TRUE) {
-		delay_ms(500);
+	*/
 
-		print_temp(get_temperature());
+	while (TRUE) {
+		//delay_ms(500);
+
+		//print_temp(get_temperature());
+
+		// TODO: Put on a interrupt.
+		if ((P1IN & LOWBATT) == 0) {
+			print_batt_symbol(0);
+		} else if ((P1IN & MOTION) == 0) {
+			lcd_set_pos(0,0);
+			lcd_print("Motion!");
+
+			delay_ms(1000);
+			lcd_set_pos(0,0);
+			lcd_print("        ");
+		}
 
 		/*
 		char str[12];
@@ -199,5 +222,18 @@ void print_symbol(unsigned int pos, unsigned int symbol) {
 		for (unsigned int col = 0; col < 12; col++) {
 			lcd_command(0, big_font_sym[symbol][row][col]);
 		}
+	}
+}
+
+/**
+ *  Print battery symbol.
+ *
+ *  @param symbol The symbol number.
+ */
+void print_batt_symbol(unsigned int symbol) {
+	lcd_set_pos(0, 5);
+
+	for (unsigned int col = 0; col < 13; col++) {
+		lcd_command(0, batt_sym[symbol][col]);
 	}
 }

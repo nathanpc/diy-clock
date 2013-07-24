@@ -76,6 +76,13 @@ static const char big_font_sym[][3][12] = {
 };
 
 /**
+ * Battery symbols.
+ */
+static const char batt_sym[][13] = {
+	{ 0b00000000, 0b01111110, 0b01000010, 0b01000010, 0b01000010, 0b01000010, 0b01000010, 0b01000010, 0b01000010, 0b01000010, 0b01111110, 0b00011000, 0b00000000 }  // Low battery.
+};
+
+/**
  *  Basic font.
  */
 static const char font[][5] = {
