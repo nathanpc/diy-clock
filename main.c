@@ -11,6 +11,7 @@
 // Devices.
 #include "PCD8544.h"
 #include "adc.h"
+#include "buzzer.h"
 
 // Helpers.
 #include "boolean.h"
@@ -58,6 +59,8 @@ void main() {
 	delay_ms(1);  // Just to make sure the LCD is ready
 	lcd_init();
 	lcd_clear();
+
+	// TODO: Setup the buzzer.
 
 	/*
 	// Date.
