@@ -19,6 +19,7 @@
 #include "delay.h"
 #include "fonts.h"
 #include "ftoa.h"
+#include "strings.h"
 
 // Pins.
 #define LOWBATT BIT5
@@ -117,9 +118,13 @@ float get_temperature() {
  *  @param month A month.
  */
 void print_date(unsigned int day, unsigned int month) {
-	// TODO: Use sprintf to generate a string.
+	// Generate the string.
+	char date_str[10];
+	snprintf(date_str, 9, "%d %s", day, month_name[month]);
+
+	// Print it.
 	lcd_set_pos(0, 0);
-	lcd_print("13 Jul");
+	lcd_print(date_str);
 }
 
 /**
@@ -133,7 +138,7 @@ void print_temp(float temp) {
 	ftoa(str, temp, 2);
 
 	// TODO: Use strlen to get the size of the string and calculate the correct position to start printing it (fixes the xx.x instead of xx.xx problem and always aligns it to the right)
-	// Posiiton and print.
+	// Positon and print.
 	lcd_set_pos(43, 0);
 	lcd_print(str);
 	lcd_putc(0x7F);
@@ -282,7 +287,7 @@ __interrupt void Timer1_ISR() {
 	// TODO: Make some if clauses to only update the things that changed.
 
 	// Update the date.
-	//print_date(13, 7);
+	print_date(_day, _month);
 
 	// Update the time.
 	print_time(_hour, _minute, FALSE);
