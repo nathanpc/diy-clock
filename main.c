@@ -53,7 +53,7 @@ void main() {
 
 	// Setup the low battery stuff.
 	P1DIR &= ~(LOWBATT + MOTION);
-	// TODO: Setup a interrupt.
+	// TODO: Put the if clause in the timer loop (the battery won't die in a minute)
 
 	// RTC stuff.
 	rtc_setup();
@@ -83,24 +83,14 @@ void main() {
 
 	// Enable the interrupts.
 	__enable_interrupt();
+	// TODO: Test that LMP + GIE thing?
 
 	while (TRUE) {
 /*
 		delay_ms(500);
 
-		print_temp(get_temperature());
+		
 
-		// TODO: Put on a interrupt.
-		if ((P1IN & LOWBATT) == 0) {
-			print_batt_symbol(0);
-		} else if ((P1IN & MOTION) == 0) {
-			lcd_set_pos(0,0);
-			lcd_print("Motion!");
-
-			delay_ms(1000);
-			lcd_set_pos(0,0);
-			lcd_print("        ");
-		}
 */
 		/*
 		char str[12];
@@ -251,4 +241,31 @@ void print_batt_symbol(unsigned int symbol) {
 	for (unsigned int col = 0; col < 13; col++) {
 		lcd_command(0, batt_sym[symbol][col]);
 	}
+}
+
+/**
+ *  TimerA1 interrupt service routine.
+ */
+#pragma vector=TIMER1_A0_VECTOR
+__interrupt void Timer1_ISR() {
+	rtc_count();
+
+	// Updates the temperature.
+	print_temp(get_temperature());
+
+	// Checks if the batteries are low.
+	if ((P1IN & LOWBATT) == 0) {
+		print_batt_symbol(0);
+	}
+
+/*
+	if ((P1IN & MOTION) == 0) {
+		lcd_set_pos(0,0);
+		lcd_print("Motion!");
+
+		delay_ms(1000);
+		lcd_set_pos(0,0);
+		lcd_print("        ");
+	}
+	 */
 }
