@@ -8,6 +8,8 @@
 #include <msp430g2553.h>
 #include "delay.h"
 
+#define CLOCKFREQ 8000
+
 /**
  * Delay by some milliseconds.
  * 
@@ -15,7 +17,7 @@
  */
 void delay_ms(unsigned int ms) {
 	while (ms--) {
-		__delay_cycles(1000);
+		__delay_cycles(CLOCKFREQ);
 	}
 }
 

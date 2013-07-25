@@ -12,6 +12,7 @@
 #include "PCD8544.h"
 #include "adc.h"
 #include "buzzer.h"
+#include "rtc.h"
 
 // Helpers.
 #include "boolean.h"
@@ -42,9 +43,13 @@ void print_batt_symbol(unsigned int symbol);
  */
 void main() {
 	WDTCTL = WDTPW + WDTHOLD;  // Disable WDT.
-	BCSCTL1 = CALBC1_1MHZ;     // 1MHz clock.
-	DCOCTL = CALDCO_1MHZ;
+	BCSCTL1 = CALBC1_8MHZ;     // 1MHz clock.
+	DCOCTL = CALDCO_8MHZ;
 	BCSCTL2 &= ~(DIVS_3);      // SMCLK = DCO = 1MHz.
+
+	// Setup for the 32kHz crystal.
+	BCSCTL1 |= DIVA_3;  // ACLK / 8.
+	BCSCTL3 |= XCAP_3;  // 12.5pF capacitor setting for 32768Hz crystal.
 
 	// Setup the low battery stuff.
 	P1DIR &= ~(LOWBATT + MOTION);
@@ -52,7 +57,6 @@ void main() {
 
 	// Setup ADC.
 	adc_setup();
-	__enable_interrupt();
 
 	// Setup the LCD stuff.
 	lcd_setup();
@@ -74,10 +78,14 @@ void main() {
 	print_time(88, 88, FALSE);
 	*/
 
-	while (TRUE) {
-		//delay_ms(500);
+	// Enable the interrupts.
+	__enable_interrupt();
 
-		//print_temp(get_temperature());
+	while (TRUE) {
+/*
+		delay_ms(500);
+
+		print_temp(get_temperature());
 
 		// TODO: Put on a interrupt.
 		if ((P1IN & LOWBATT) == 0) {
@@ -90,7 +98,7 @@ void main() {
 			lcd_set_pos(0,0);
 			lcd_print("        ");
 		}
-
+*/
 		/*
 		char str[12];
 		fetch_adc_readings();
@@ -148,6 +156,7 @@ void print_temp(float temp) {
 	char str[6];
 	ftoa(str, temp, 2);
 
+	// TODO: Use strlen to get the size of the string and calculate the correct position to start printing it (fixes the xx.x instead of xx.xx problem and always aligns it to the right)
 	// Posiiton and print.
 	lcd_set_pos(43, 0);
 	lcd_print(str);
