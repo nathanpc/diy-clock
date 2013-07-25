@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <msp430g2553.h>
 
 // Devices.
@@ -134,16 +135,20 @@ void print_date(unsigned int day, unsigned int month) {
  */
 void print_temp(float temp) {
 	// Convert float to string.
-	char str[6];
-	ftoa(str, temp, 2);
+	char tmp_str[6];
+	ftoa(tmp_str, temp, 2);
 
-	// TODO: Use strlen to get the size of the string and calculate the correct position to start printing it (fixes the xx.x instead of xx.xx problem and always aligns it to the right)
-	// Positon and print.
-	lcd_set_pos(43, 0);
-	lcd_print(str);
+	// Correct the display if there's only 4 chars to print.
+	if (strlen(tmp_str) == 4) {
+		lcd_set_pos(43, 0);
+		lcd_putc(' ');
+	}
+
+	// Position and print.
+	lcd_set_pos(68 - (strlen(tmp_str) * 5), 0);
+	lcd_print(tmp_str);
 	lcd_putc(0x7F);
 	lcd_putc('C');
-	lcd_putc(' ');  // Just to make sure.
 }
 
 /**
