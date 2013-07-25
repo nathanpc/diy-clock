@@ -55,6 +55,9 @@ void main() {
 	P1DIR &= ~(LOWBATT + MOTION);
 	// TODO: Setup a interrupt.
 
+	// RTC stuff.
+	rtc_setup();
+
 	// Setup ADC.
 	adc_setup();
 
