@@ -9,11 +9,11 @@
 #define RTC_H_
 
 // Timing variables.
-unsigned int minute = 0;
-unsigned int hour   = 0;
-unsigned int day    = 1;
-unsigned int month  = 0;
-unsigned int year   = 2013;
+extern unsigned int _minute;
+extern unsigned int _hour;
+extern unsigned int _day;
+extern unsigned int _month;
+extern unsigned int _year;
 
 void rtc_setup();
 void rtc_count();

@@ -1,4 +1,4 @@
-NAME = lcd-driver
+NAME = bedside-clock
 DEVICE= msp430g2553
 PROJECT = $(NAME)-$(DEVICE)
 CC = msp430-gcc -std=c99 -Os -mmcu=$(DEVICE)

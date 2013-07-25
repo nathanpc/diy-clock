@@ -32,7 +32,7 @@ float get_temperature();
 
 void print_date(unsigned int day, unsigned int month);
 void print_temp(float temp);
-void print_time(unsigned int hour, unsigned int minutes, bool pm);
+void print_time(unsigned int hour, unsigned int minute, bool pm);
 void print_digit(unsigned int pos, unsigned int digit);
 void print_symbol(unsigned int pos, unsigned int symbol);
 void print_batt_symbol(unsigned int symbol);
@@ -51,9 +51,8 @@ void main() {
 	BCSCTL1 |= DIVA_3;  // ACLK / 8.
 	BCSCTL3 |= XCAP_3;  // 12.5pF capacitor setting for 32768Hz crystal.
 
-	// Setup the low battery stuff.
+	// Setup the low battery pin.
 	P1DIR &= ~(LOWBATT + MOTION);
-	// TODO: Put the if clause in the timer loop (the battery won't die in a minute)
 
 	// RTC stuff.
 	rtc_setup();
@@ -66,32 +65,16 @@ void main() {
 	delay_ms(1);  // Just to make sure the LCD is ready
 	lcd_init();
 	lcd_clear();
+	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
 
 	// TODO: Setup the buzzer.
-
-	/*
-	// Date.
-	print_date(13, 7);
-
-	// Temp.
-	//print_temp(888);
-
-	// Digits.
-	print_symbol(':', 0);  // This should only be printed one time, since it never changes.
-	print_time(88, 88, FALSE);
-	*/
 
 	// Enable the interrupts.
 	__enable_interrupt();
 	// TODO: Test that LMP + GIE thing?
 
+	// TODO: Remove this crap after everything is in the interrupt.
 	while (TRUE) {
-/*
-		delay_ms(500);
-
-		
-
-*/
 		/*
 		char str[12];
 		fetch_adc_readings();
@@ -162,15 +145,58 @@ void print_temp(float temp) {
  *  Prints the time on the screen.
  *
  *  @param hour The hour.
- *  @param minutes The minutes.
+ *  @param minute The minutes.
  *  @param pm Is is afternoon already?
  */
-void print_time(unsigned int hour, unsigned int minutes, bool pm) {
-	// TODO: Separate each part into digits.
-	print_digit(0, 8);
-	print_digit(1, 8);
-	print_digit(2, 8);
-	print_digit(3, 8);
+void print_time(unsigned int hour, unsigned int minute, bool pm) {
+	// Updates the minutes.
+	if (minute < 10) {
+		// Between 0 and 9.
+		print_digit(2, 0);
+		print_digit(3, minute);
+	} else if ((minute >= 10) && (minute < 20)) {
+		// Between 10 and 19.
+		print_digit(2, 1);
+		print_digit(3, minute - 10);
+	} else if ((minute >= 20) && (minute < 30)) {
+		// Between 20 and 29.
+		print_digit(2, 2);
+		print_digit(3, minute - 20);
+	} else if ((minute >= 30) && (minute < 40)) {
+		// Between 30 and 39.
+		print_digit(2, 3);
+		print_digit(3, minute - 30);
+	} else if ((minute >= 40) && (minute < 50)) {
+		// Between 40 and 49.
+		print_digit(2, 4);
+		print_digit(3, minute - 40);
+	} else if ((minute >= 50) && (minute < 60)) {
+		// Between 50 and 59.
+		print_digit(2, 5);
+		print_digit(3, minute - 50);
+	} else {
+		print_digit(2, 8);
+		print_digit(3, 8);
+	}
+
+	// Updates the hours.
+	if (hour < 10) {
+		// Between 0 and 9.
+		print_digit(0, 0);
+		print_digit(1, hour);
+	} else if ((hour >= 10) && (hour < 20)) {
+		// Between 10 and 19.
+		print_digit(0, 1);
+		print_digit(1, hour - 10);
+	} else if ((hour >= 20) && (hour < 24)) {
+		// Between 20 and 23.
+		print_digit(0, 2);
+		print_digit(1, hour - 20);
+	} else {
+		// How did we get here?
+		print_digit(0, 8);
+		print_digit(1, 8);
+	}
 
 	// AM/PM
 	lcd_set_pos(71, 5);
@@ -252,6 +278,14 @@ __interrupt void Timer1_ISR() {
 
 	// Updates the temperature.
 	print_temp(get_temperature());
+
+	// TODO: Make some if clauses to only update the things that changed.
+
+	// Update the date.
+	//print_date(13, 7);
+
+	// Update the time.
+	print_time(_hour, _minute, FALSE);
 
 	// Checks if the batteries are low.
 	if ((P1IN & LOWBATT) == 0) {
